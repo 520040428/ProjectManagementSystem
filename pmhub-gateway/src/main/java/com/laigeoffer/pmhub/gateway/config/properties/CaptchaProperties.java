@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
  * @author canghe
  */
 @Configuration
-@RefreshScope
+@RefreshScope  //负责热更新能力，需要yml/nacos配置修改自动刷新到字段，必须与@ConfigurationProperties连用
 @ConfigurationProperties(prefix = "security.captcha")
 public class CaptchaProperties
 {

@@ -5,18 +5,21 @@ server:
 # Spring
 spring: 
   application:
-    # 应用名称
+    # Spring Boot微服务的应用名称
     name: pmhub-gateway
   profiles:
     # 环境配置
     active: dev
+  # bootstrap.yml是Spring Cloud微服务专属引导配置文件，只有引入了Spring Cloud/Spring Clous Alibaba依赖才会生效
   cloud:
     nacos:
+      # 网关服务启动时，把自己注册进nacos注册中心，程序去这个地址完成服务注册，服务发现
       discovery:
         # 服务注册地址
         server-addr: 127.0.0.1:8848
         username: nacos
         password: nacos
+      # 程序连接这里，拉取线上远程配置文件
       config:
         # 配置中心地址
         server-addr: 127.0.0.1:8848
@@ -24,25 +27,37 @@ spring:
         password: nacos
         # 配置文件格式
         file-extension: yml
-        # 共享配置
+        # 共享配置,程序启动后回去nacos服务端找这个文件下载，application-dev.yml
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+    # 网关流控规则：为pmhub-gateway网关接入Sentinel流量防护
     sentinel:
-      # 取消控制台懒加载
+      # 取消控制台懒加载（懒加载指的是接口第一次被访问后，才会初始化客户端，连接控制台,监控页面一开始是空的）
+      # true即立即加载：项目一启动就主动连接Sentinel控制台，无需等请求进来就能看到服务，本地调试必备
       eager: true
       transport:
         # 配置控制台服务地址
-        dashboard: 127.0.0.1:8080
+        dashboard: 127.0.0.1:8081
         # 默认 8719 端口，假如被占用会自动从 8719 开始依次 +1 扫描,直至找到未被占用的端口
         port: 8719
-      # nacos配置持久化
+      # nacos配置持久化（因为sentinel默认规则内存级临时生效：服务重启，规则直接消失）
+      # 通过 Nacos 数据源，把网关限流规则存在 Nacos 远程，服务启动自动拉取，sentinel控制台修改规则实时同步、永久保存（无需重启网关立刻生效）。
       datasource:
         ds1:
           nacos:
+            # nacos服务地址，用来读写限流规则配置
             server-addr: 127.0.0.1:8848
+            # nacos里存放Sentinel规则的配置文件唯一标识
             dataId: sentinel-pmhub-gateway
+            # nacos配置分组，默认分组，统一保持一致即可
             groupId: DEFAULT_GROUP
+            # nacos中规则文件的格式，sentinel网关规则固定使用json
             data-type: json
+            # gw-flow = Gateway Flow 网关限流规则（专门针对 SpringCloud Gateway 网关路由限流）
+            # 其他可选类型：
+            # flow：普通接口限流
+            # degrade：熔断降级
+            # authority：黑白名单授权
             rule-type: gw-flow
 
 # 实时log配置，可在http://localhost:6888/ 监控中心查看实时日志
