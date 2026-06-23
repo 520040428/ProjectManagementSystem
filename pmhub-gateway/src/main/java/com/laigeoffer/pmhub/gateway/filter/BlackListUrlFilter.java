@@ -23,6 +23,7 @@ public class BlackListUrlFilter extends AbstractGatewayFilterFactory<BlackListUr
         return (exchange, chain) -> {
 
             String url = exchange.getRequest().getURI().getPath();
+            // 如果我们获得请求体的url是我们黑名单中的url，我们置返回信息为"请求地址不允许访问"
             if (config.matchBlacklist(url))
             {
                 return ServletUtils.webFluxResponseWriter(exchange.getResponse(), "请求地址不允许访问");
@@ -55,9 +56,13 @@ public class BlackListUrlFilter extends AbstractGatewayFilterFactory<BlackListUr
 
         public void setBlacklistUrl(List<String> blacklistUrl)
         {
+            // 设置黑名单Url列表
             this.blacklistUrl = blacklistUrl;
+            // 清空现有的Url匹配模式
             this.blacklistUrlPattern.clear();
+            // 遍历黑名单，将通配符转换为正则表达式并编译为模式对象
             this.blacklistUrl.forEach(url -> {
+                // 将Url中的通配符**替换为正则表达式(.*?)，忽略大小写
                 this.blacklistUrlPattern.add(Pattern.compile(url.replaceAll("\\*\\*", "(.*?)"), Pattern.CASE_INSENSITIVE));
             });
         }
