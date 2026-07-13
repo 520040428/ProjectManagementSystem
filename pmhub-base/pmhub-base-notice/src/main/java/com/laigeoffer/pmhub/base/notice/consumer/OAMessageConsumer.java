@@ -75,6 +75,7 @@ public class OAMessageConsumer implements CommandLineRunner {
 
         // 初始化PushConsumer，需要绑定消费者分组ConsumerGroup、通信参数以及订阅关系。
         try {
+            //设置消息过滤
             FilterExpression wxFilterExpression = new FilterExpression(RocketMqUtils.mqTag, FilterExpressionType.TAG);
 
             PushConsumer pushConsumer = provider.newPushConsumerBuilder()

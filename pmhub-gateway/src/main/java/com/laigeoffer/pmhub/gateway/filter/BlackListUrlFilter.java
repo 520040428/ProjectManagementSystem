@@ -46,6 +46,9 @@ public class BlackListUrlFilter extends AbstractGatewayFilterFactory<BlackListUr
 
         public boolean matchBlacklist(String url)
         {
+            // anyMatch()方法只要有一条命中就返回true,全部不命中返回false
+            // p.matcher(url)：用正则创建匹配器，匹配目标 url
+            // find()：只要 url 中任意一段包含正则匹配内容，就返回 true
             return !blacklistUrlPattern.isEmpty() && blacklistUrlPattern.stream().anyMatch(p -> p.matcher(url).find());
         }
 

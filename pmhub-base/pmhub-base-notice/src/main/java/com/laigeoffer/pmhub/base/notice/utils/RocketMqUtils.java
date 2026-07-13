@@ -66,14 +66,16 @@ public class RocketMqUtils {
     public static void push2Wx(com.laigeoffer.pmhub.base.notice.domain.entity.Message ob){
 
         try {
-
+            //使用Hutool工具包生成消息唯一标识，作为消息的业务索引键
             String key = IdUtil.simpleUUID();
             ObjectMapper objectMapper = new ObjectMapper();
             // 接入点地址，需要设置成Proxy的地址和端口列表，一般是xxx:8081;xxx:8081。
             String endpoint = addr;
             // 消息发送的目标Topic名称，需要提前创建。
             String topic = WX_TOPIC;
+            //加载并获取 RocketMQ 客户端的服务提供者实例，它是创建生产者、消费者和消息对象的“超级工厂”。
             ClientServiceProvider provider = ClientServiceProvider.loadService();
+            //设置接入点，连接Proxy代理节点，这里指的是RockerMQ的地址
             ClientConfigurationBuilder builder = ClientConfiguration.newBuilder().setEndpoints(endpoint);
             ClientConfiguration configuration = builder.build();
             // 初始化Producer时需要设置通信配置以及预绑定的Topic。
@@ -92,7 +94,7 @@ public class RocketMqUtils {
                     .setBody(objectMapper.writeValueAsString(ob).getBytes())
                     .build();
 
-            // 发送消息，需要关注发送结果，并捕获失败等异常。
+            // 发送消息，需要关注发送结果，并捕获失败等异常。这里的sendReceipt包含消息ID
             SendReceipt sendReceipt = producer.send(message);
             LogFactory.get().info("Send message successfully, messageId={}", sendReceipt.getMessageId());
 
