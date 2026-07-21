@@ -26,13 +26,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 网关鉴权
+ * 网关鉴权(全局过滤器)
+ * 全局过滤器是全局生效的，一旦实现接口并注册为Spring Bean,就会自动作用于所有的路由配置(不需要在application.yml配置文件中显示配置，代码启动即生效)
+ *@description 这段代码基于Spring Cloud Gateway的全局鉴权过滤器，核心作用在网管层统一拦截所有进入的HTTP请求，进行身份验证和权限校验，同时记录接口的访问耗时日志
  *
- * @author canghe
- * @description 这段代码基于Spring Cloud Gateway的全局鉴权过滤器，核心作用在网管层统一拦截所有进入的HTTP请求，进行身份验证和权限校验，同时记录接口的访问耗时日志
+ * @author JingYi
+ *
  */
 @Component
 public class AuthFilter implements GlobalFilter, Ordered {
+    // 和@Slf4j作用一致，不过这里显式定义
     private static final Logger log = LoggerFactory.getLogger(AuthFilter.class);
 
     private static final String BEGIN_VISIT_TIME = "begin_visit_time";//开始访问时间
@@ -45,6 +48,12 @@ public class AuthFilter implements GlobalFilter, Ordered {
     private RedisService redisService;
 
 
+    /**
+     * 重写GlobalFilter接口的filter方法，实现自定义的过滤器逻辑，Mono是响应式编程中的类型，表示一个异步的，不会返回具体数据的任务
+     * @param exchange
+     * @param chain
+     * @return
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         //ServerWebExchange是网关里的核心上下文对象，一次完整请求的全部信息都存在它里面

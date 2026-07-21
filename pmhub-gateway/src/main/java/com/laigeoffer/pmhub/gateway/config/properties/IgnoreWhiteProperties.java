@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * 放行白名单配置
  * 
- * @author canghe
+ * @author JingYi
  */
 @Configuration
-@RefreshScope
+@RefreshScope // 热更新，需要与nacos自动刷新字段，与下一个注解配套使用
 @ConfigurationProperties(prefix = "security.ignore")
 public class IgnoreWhiteProperties
 {

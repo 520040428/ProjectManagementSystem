@@ -37,6 +37,7 @@ public class ValidateCodeHandler implements HandlerFunction<ServerResponse>
         {
             return Mono.error(e);
         }
+        // HTTP状态码为200 OK，把普通的 Java 对象（我们的 AjaxResult）转换成一个响应式的 BodyInserter。
         return ServerResponse.status(HttpStatus.OK).body(BodyInserters.fromValue(ajax));
     }
 }

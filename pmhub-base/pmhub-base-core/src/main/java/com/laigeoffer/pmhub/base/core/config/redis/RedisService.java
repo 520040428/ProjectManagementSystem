@@ -10,12 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * spring redis 工具类
- *
+ * description 对Spring Data Redis的RRedisTemplate进行封装，旨在提供更简洁，更符合业务语义的API来操作Redis缓存
  * @author canghe
  **/
 @SuppressWarnings(value = {"unchecked", "rawtypes"})
 @Component
 public class RedisService {
+    // 线程安全的
     @Autowired
     public RedisTemplate redisTemplate;
 

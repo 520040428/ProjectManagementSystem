@@ -15,8 +15,10 @@ import reactor.core.publisher.Mono;
 /**
  * 网关统一异常处理
  *
- * @author canghe
+ *
+ * @author JingYi
  */
+// SpringBoot默认提供了一个一场处理器叫做DefaultErrorWebExceptionHandler，它的默认Order值通常是0或者更高
 @Order(-1)
 @Configuration
 public class GatewayExceptionHandler implements ErrorWebExceptionHandler
@@ -28,6 +30,7 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler
     {
         ServerHttpResponse response = exchange.getResponse();
 
+        // 如果响应已经提交，我们无法自定义错误信息，直接异常抛出
         if (exchange.getResponse().isCommitted())
         {
             return Mono.error(ex);
@@ -35,15 +38,18 @@ public class GatewayExceptionHandler implements ErrorWebExceptionHandler
 
         String msg;
 
+        // 通常是404错误
         if (ex instanceof NotFoundException)
         {
             msg = "服务未找到";
         }
+        // 通常是Spring的通用响应状态异常，通常包含了具体的业务错误信息
         else if (ex instanceof ResponseStatusException)
         {
             ResponseStatusException responseStatusException = (ResponseStatusException) ex;
             msg = responseStatusException.getMessage();
         }
+        // 兜底逻辑，如果是其他未预料的系统错误，提示"内部服务器错误"
         else
         {
             msg = "内部服务器错误";

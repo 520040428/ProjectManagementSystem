@@ -85,6 +85,12 @@
             <version>5.3.1</version>
         </dependency>
 
+        <!--添加分布式事务-->
+        <dependency>
+            <groupId>com.laigeoffer.pmhub-cloud</groupId>
+            <artifactId>pmhub-base-seata</artifactId>
+        </dependency>
+
         <!--Rocketmq-消息提醒，注意：如果不需要此模块，请自行注释，否则项目无法启动-->
 <!--        <dependency>-->
 <!--            <groupId>com.laigeoffer.pmhub-cloud</groupId>-->

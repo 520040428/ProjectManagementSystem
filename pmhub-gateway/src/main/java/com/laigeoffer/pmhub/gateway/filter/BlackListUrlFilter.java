@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * 黑名单过滤器
+ * 黑名单过滤器(网关过滤器)
+ * 针对特定路由生效，必须绑定到某个具体的路由配置上才会工作，需要在application.yml的路由配置下显式指定才能生效
+ * @description 主要作用是拦截特定路由的请求，并检查请求中的URL是否命中了配置的黑名单。如果命中，则直接拒绝访问
  *
- * @author canghe
+ * @author JingYi
  */
 @Component
 public class BlackListUrlFilter extends AbstractGatewayFilterFactory<BlackListUrlFilter.Config>
@@ -33,6 +35,7 @@ public class BlackListUrlFilter extends AbstractGatewayFilterFactory<BlackListUr
         };
     }
 
+    // 调用父类构造函数，将Config类的字节码对象传递给父类，目的是告诉框架这个过滤器使用Config类来接收配置参数
     public BlackListUrlFilter()
     {
         super(Config.class);
@@ -40,8 +43,10 @@ public class BlackListUrlFilter extends AbstractGatewayFilterFactory<BlackListUr
 
     public static class Config
     {
+        // 原始配置的黑名单URL列表
         private List<String> blacklistUrl;
 
+        // 编译后的正则表达式列表，用于高性能匹配
         private List<Pattern> blacklistUrlPattern = new ArrayList<>();
 
         public boolean matchBlacklist(String url)

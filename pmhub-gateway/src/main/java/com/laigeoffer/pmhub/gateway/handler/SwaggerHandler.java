@@ -11,6 +11,11 @@ import springfox.documentation.swagger.web.*;
 
 import java.util.Optional;
 
+/**
+ * 配合前端 Swagger UI 页面工作而提供的数据接口。
+ *
+ * @author JingYi
+ */
 @RestController
 @RequestMapping("/swagger-resources")
 public class SwaggerHandler
@@ -21,14 +26,20 @@ public class SwaggerHandler
     @Autowired(required = false)
     private UiConfiguration uiConfiguration;
 
+    // 使用final字段保证swaggerResources一旦被赋值就不能改变
     private final SwaggerResourcesProvider swaggerResources;
 
+    // 在构造器注入，不但可以配合final保证不变性，并且在类加载阶段就可以告诉是否缺东西，字段注入的话运行到才可以报空指针
     @Autowired
     public SwaggerHandler(SwaggerResourcesProvider swaggerResources)
     {
         this.swaggerResources = swaggerResources;
     }
 
+    /**
+     * 提供Swagger的安全认证配置
+     * @return
+     */
     @GetMapping("/configuration/security")
     public Mono<ResponseEntity<SecurityConfiguration>> securityConfiguration()
     {
@@ -37,6 +48,10 @@ public class SwaggerHandler
                 HttpStatus.OK));
     }
 
+    /**
+     * 提供Swagger UI的界面显示配置
+     * @return
+     */
     @GetMapping("/configuration/ui")
     public Mono<ResponseEntity<UiConfiguration>> uiConfiguration()
     {
@@ -44,6 +59,7 @@ public class SwaggerHandler
                 Optional.ofNullable(uiConfiguration).orElse(UiConfigurationBuilder.builder().build()), HttpStatus.OK));
     }
 
+    // 用于提供所有微服务的API文档资源列表，我们要看的API列表就是访问这个网址
     @SuppressWarnings("rawtypes")
     @GetMapping("")
     public Mono<ResponseEntity> swaggerResources()

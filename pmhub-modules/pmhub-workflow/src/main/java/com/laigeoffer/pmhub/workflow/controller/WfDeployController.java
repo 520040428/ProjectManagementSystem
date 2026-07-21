@@ -15,6 +15,7 @@ import com.laigeoffer.pmhub.workflow.domain.vo.WfDeployVo;
 import com.laigeoffer.pmhub.workflow.domain.vo.WfFormVo;
 import com.laigeoffer.pmhub.workflow.service.IWfDeployFormService;
 import com.laigeoffer.pmhub.workflow.service.IWfDeployService;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;

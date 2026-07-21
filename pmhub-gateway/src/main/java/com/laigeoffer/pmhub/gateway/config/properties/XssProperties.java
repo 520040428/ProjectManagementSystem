@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * XSS跨站脚本配置
  * 
- * @author canghe
+ * @author JingYi
  */
 @Configuration
 @RefreshScope

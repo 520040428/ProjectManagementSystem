@@ -5,9 +5,9 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 验证码配置
+ * 验证码绑定配置类(yml文件中的security.captcha绑定)
  * 
- * @author canghe
+ * @author JingYi
  */
 @Configuration
 @RefreshScope  //负责热更新能力，需要yml/nacos配置修改自动刷新到字段，必须与@ConfigurationProperties连用
@@ -20,7 +20,7 @@ public class CaptchaProperties
     private Boolean enabled;
 
     /**
-     * 验证码类型（math 数组计算 char 字符）
+     * 验证码类型
      */
     private String type;
 

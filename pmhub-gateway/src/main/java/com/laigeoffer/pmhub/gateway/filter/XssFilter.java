@@ -25,9 +25,9 @@ import java.util.List;
 
 /**
  * 跨站脚本过滤器
+ * @description 主要功能是防御跨站脚本攻击(XSS),拦截请求，读取并清洗请求体中的恶意脚本(用户在提交表单的时候在JSON数据中注入JS恶意脚本，导致Cookie窃取，会话劫持等安全问题)，实现接口的安全防护
  *
- * @author canghe
- * @description 主要功能是防御跨站脚本攻击(XSS),拦截请求，读取并清洗请求体中的恶意脚本，实现接口的安全防护
+ * @author JingYi
  */
 @Component
 //条件注解：只有配置文件中 security.xss.enabled=true 时，当前类 / 方法才会注册为 Spring Bean。
@@ -60,6 +60,7 @@ public class XssFilter implements GlobalFilter, Ordered
         }
         // excludeUrls 不过滤(由于公告模块本身包含大量的HTML标签，如果过滤页面展示时无法正常渲染排版，全部显示原始代码文本)
         String url = request.getURI().getPath();
+        // 比如notice模块
         if (StringUtils.matches(url, xss.getExcludeUrls()))
         {
             return chain.filter(exchange);

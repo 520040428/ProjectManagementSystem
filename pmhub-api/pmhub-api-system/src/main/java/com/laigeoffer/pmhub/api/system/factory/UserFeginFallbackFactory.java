@@ -21,6 +21,7 @@ import java.util.List;
 @Component
 public class UserFeginFallbackFactory implements FallbackFactory<UserFeignService>
 {
+    // 这与Lombok中的@Slf4j注解功能一致，为了显式地给出我们log，给开发人员做标记
     private static final Logger log = LoggerFactory.getLogger(UserFeginFallbackFactory.class);
 
     @Override
