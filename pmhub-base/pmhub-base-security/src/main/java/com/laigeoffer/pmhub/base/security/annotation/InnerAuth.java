@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 内部认证注解
  * 
- * @author canghe
+ * @author JingYi
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

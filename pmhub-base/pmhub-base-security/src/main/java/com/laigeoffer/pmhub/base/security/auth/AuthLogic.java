@@ -33,6 +33,7 @@ public class AuthLogic
     /** 管理员角色权限标识 */
     private static final String SUPER_ADMIN = "admin";
 
+    // 从Spring容器中拿出TokenService Bean对象，这里不用Autowired，因为AuthLogic不是Bean，Spring不能管它的字段
     public TokenService tokenService = SpringUtils.getBean(TokenService.class);
 
     /**
@@ -50,6 +51,7 @@ public class AuthLogic
 
     /**
      * 会话注销，根据指定Token
+     * @param token
      */
     public void logoutByToken(String token)
     {
