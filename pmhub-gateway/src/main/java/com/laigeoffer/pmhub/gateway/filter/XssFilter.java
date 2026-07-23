@@ -71,6 +71,11 @@ public class XssFilter implements GlobalFilter, Ordered
 
     }
 
+    /**
+     * 通过装饰器模式拦截getBody()方法，将原始数据流替换成“处理后的内存数据”
+     * @param exchange
+     * @return
+     */
     private ServerHttpRequestDecorator requestDecorator(ServerWebExchange exchange)
     {
         //重写ServerHttpRequestDecorator的getBody方法以及getHeaders方法，实现自定义
@@ -102,6 +107,7 @@ public class XssFilter implements GlobalFilter, Ordered
                     // 使用 NettyDataBufferFactory 分配一个新的 DataBuffer，将字节数组写入，并返回。这样下游处理拿到的就是被XSS过滤后的安全请求体。
                     NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
                     DataBuffer buffer = nettyDataBufferFactory.allocateBuffer(bytes.length);
+                    // 这个是在内存中构建好的DataBuffer，因为它存在于Java堆内存中，可以被反复读取，或者包装成一个新的Flux发送给下游
                     buffer.write(bytes);
                     return buffer;
                 });

@@ -92,6 +92,10 @@ public class SysLoginService {
         return userInfo;
     }
 
+    /**
+     * 退出
+     * @param loginName
+     */
     public void logout(String loginName) {
         recordLogService.recordLogininfor(loginName, Constants.LOGOUT, "退出成功");
     }

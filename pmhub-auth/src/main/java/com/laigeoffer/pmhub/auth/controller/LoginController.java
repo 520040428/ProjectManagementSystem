@@ -50,7 +50,7 @@ public class LoginController {
     @PostMapping("login")
     public AjaxResult login(@RequestBody LoginBody form) {
         AjaxResult ajax = success();
-        // 用户登录
+        // 用户登录，验证账号密码
         LoginUser userInfo = sysLoginService.login(form.getUsername(), form.getPassword());
         // 获取登录token
         String token = tokenService.createToken(userInfo);

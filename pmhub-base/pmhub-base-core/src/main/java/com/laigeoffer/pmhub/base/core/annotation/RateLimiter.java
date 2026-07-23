@@ -8,6 +8,7 @@ import java.lang.annotation.*;
 
 /**
  * 限流注解
+ * @description 实现接口限流功能的核心组件
  *
  * @author canghe
  */
