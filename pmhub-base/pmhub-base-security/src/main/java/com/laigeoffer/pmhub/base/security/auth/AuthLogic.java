@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * Token 权限验证，逻辑实现类
  * 
- * @author canghe
+ * @author JingYi
  */
 public class AuthLogic
 {
@@ -78,6 +78,7 @@ public class AuthLogic
         {
             throw new NotLoginException("未提供token");
         }
+        // 这里通过SecurityUtils工具类获取“认证后的用户上下文(即ThreadLocal中的)”
         LoginUser loginUser = SecurityUtils.getLoginUser();
         if (loginUser == null)
         {
@@ -134,12 +135,15 @@ public class AuthLogic
 
     /**
      * 根据注解(@RequiresPermissions)鉴权, 如果验证未通过，则抛出异常: NotPermissionException
-     * 
+     *
+     * @RequiresPermissions是给AOP切面看的，这里是给“方法内部逻辑”用的
      * @param requiresPermissions 注解对象
      */
     public void checkPermi(RequiresPermissions requiresPermissions)
     {
+        // 将需要的权限放在SecurityContextHolder中
         SecurityContextHolder.setPermission(StringUtils.join(requiresPermissions.value(), ","));
+        // 如果我们需要权限需要全部拥有，则checkAnd
         if (requiresPermissions.logical() == Logical.AND)
         {
             checkPermiAnd(requiresPermissions.value());
@@ -157,7 +161,9 @@ public class AuthLogic
      */
     public void checkPermiAnd(String... permissions)
     {
+        // 拿到我们当前登录用户的权限
         Set<String> permissionList = getPermiList();
+        // 遍历我们的权限列表，只要其中一个，用户没有权限列表中的权限，则抛出异常
         for (String permission : permissions)
         {
             if (!hasPermi(permissionList, permission))
@@ -175,6 +181,7 @@ public class AuthLogic
     public void checkPermiOr(String... permissions)
     {
         Set<String> permissionList = getPermiList();
+        // 遍历我们需要的每个权限，只要其中一个，用户有权限列表中的权限，就运行
         for (String permission : permissions)
         {
             if (hasPermi(permissionList, permission))
@@ -182,8 +189,11 @@ public class AuthLogic
                 return;
             }
         }
+        // 5. 如果循环结束了还没 return，说明遍历了所有需求权限，用户一个都没有
+        // 这里是个防御性代码，如果我们的注解中没有要求权限，则直接放行
         if (permissions.length > 0)
         {
+            // 6. 抛出“无权限”异常
             throw new NotPermissionException(permissions);
         }
     }

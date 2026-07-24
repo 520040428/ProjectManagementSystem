@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 /**
  * 基于 Spring Aop 的注解鉴权
  * 
- * @author kong
+ * @author JingYi
  */
 @Aspect
 @Component
@@ -70,7 +70,8 @@ public class PreAuthorizeAspect
     }
 
     /**
-     * 对一个Method对象进行注解检查
+     * 对一个Method对象进行注解检查，登录，角色，权限检查
+     * @param method
      */
     public void checkMethodAnnotation(Method method)
     {

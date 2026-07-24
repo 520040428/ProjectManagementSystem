@@ -19,8 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 全局异常处理器
  *
- * @author canghe
+ * @author JingYi
  */
+// 这是 Spring 3.2 提供的注解，它是 @ControllerAdvice 和 @ResponseBody 的组合体。
+// 会拦截所有 Controller 层抛出的异常（相当于一个全局的拦截器）。
+// 加上 Response 的语义，表示该类中所有方法的返回值都会自动转换为 JSON 格式。
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
@@ -31,6 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotPermissionException.class)
     public AjaxResult handleAccessDeniedException(NotPermissionException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
+        // 记录日志：包含请求路径和错误信息
         log.error("请求地址'{}',权限校验失败'{}'", requestURI, e.getMessage());
         return AjaxResult.error(HttpStatus.FORBIDDEN, "没有权限，请联系管理员授权");
     }
@@ -52,7 +56,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceException.class)
     public AjaxResult handleServiceException(ServiceException e, HttpServletRequest request) {
         log.error(e.getMessage(), e);
+        // 尝试获取异常中自定义的错误码
         Integer code = e.getCode();
+        // 如果有自定义码则返回，否则返回通用错误
         return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
     }
 

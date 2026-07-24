@@ -13,8 +13,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * 内部服务调用验证处理
+ * @description 防止外部请求绕过网关，直接调用内部微服务接口。
  *
- * @author canghe
+ * @author JingYi
  */
 @Aspect
 @Component
@@ -22,7 +23,7 @@ public class InnerAuthAspect implements Ordered {
     @Around("@annotation(innerAuth)")
     public Object innerAround(ProceedingJoinPoint point, InnerAuth innerAuth) throws Throwable {
         String source = ServletUtils.getRequest().getHeader(SecurityConstants.FROM_SOURCE);
-        // 内部请求验证
+        // 内部请求验证，不是内部请求
         if (!StringUtils.equals(SecurityConstants.INNER, source)) {
             throw new InnerAuthException("没有内部访问权限，不允许访问");
         }

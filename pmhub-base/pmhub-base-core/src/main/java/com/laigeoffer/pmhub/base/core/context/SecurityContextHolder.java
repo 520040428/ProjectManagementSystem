@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SecurityContextHolder
 {
+    // 核心存储：使用阿里的 TransmittableThreadLocal 而不是普通的 ThreadLocal
+    // TTL 解决了这个问题，能够实现跨线程池的上下文传递。
     private static final TransmittableThreadLocal<Map<String, Object>> THREAD_LOCAL = new TransmittableThreadLocal<>();
 
     public static void set(String key, Object value)

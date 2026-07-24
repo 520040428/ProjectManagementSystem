@@ -41,7 +41,7 @@ public class LogAspect {
     private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
 
     /**
-     * 处理完请求后执行
+     * 处理完请求后执行(正常执行完毕后触发)
      *
      * @param joinPoint 切点
      */
@@ -61,6 +61,13 @@ public class LogAspect {
         handleLog(joinPoint, controllerLog, e, null);
     }
 
+    /**
+     * 负责收集所有必要的日志信息
+     * @param joinPoint
+     * @param controllerLog
+     * @param e
+     * @param jsonResult
+     */
     protected void handleLog(final JoinPoint joinPoint, Log controllerLog, final Exception e, Object jsonResult) {
         try {
             // 获取当前的用户
