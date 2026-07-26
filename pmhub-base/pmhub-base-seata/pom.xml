@@ -17,6 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+<!--    这里要保证和我们的客户端seata版本保持一致-->
     <dependencies>
         <!-- SpringBoot Seata -->
         <dependency>

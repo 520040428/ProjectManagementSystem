@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.List;
 
 /**
- * @author canghe
+ * @author JingYi
  * @description 流程部署服务
- * @create 2024-04-24-22:38
  */
 @FeignClient(contextId = "deployFeignService", value = ServiceNameConstants.WORKFLOW_SERVICE, fallbackFactory = ProcessFeignFallbackFactory.class)
 public interface DeployFeignService {

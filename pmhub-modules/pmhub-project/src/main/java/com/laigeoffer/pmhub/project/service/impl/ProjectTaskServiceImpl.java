@@ -343,27 +343,38 @@ public class ProjectTaskServiceImpl extends ServiceImpl<ProjectTaskMapper, Proje
         return new PageInfo<>(list);
     }
 
+    /**
+     * 添加一个任务
+     * @param taskReqVO
+     * @return
+     */
     @Override
+    // 全局事务名称为"pmhub-project-addTask"，发生异常时回滚
     @GlobalTransactional(name = "pmhub-project-addTask",rollbackFor = Exception.class) //seata分布式事务，AT模式
     public String add(TaskReqVO taskReqVO) {
         // xid 全局事务id的检查（方便查看）
         String xid = RootContext.getXID();
         log.info("---------------开始新建任务: "+"\t"+"xid: "+xid);
 
+        // 如果我们要创建任务的项目的状态是暂停状态，则抛出业务异常"项目暂停"
         if (ProjectStatusEnum.PAUSE.getStatus().equals(projectTaskMapper.queryProjectStatus(taskReqVO.getProjectId()))) {
             throw new ServiceException("归属项目已暂停，无法新增任务");
         }
 
         // 1、添加任务
         ProjectTask projectTask = new ProjectTask();
+        // 如果 taskReqVO 中提供了 taskId，则将其设置为父任务 ID（支持子任务）。
         if (StringUtils.isNotBlank(taskReqVO.getTaskId())) {
             projectTask.setTaskPid(taskReqVO.getTaskId());
         }
+        // 把表单中传进来的属性放到我们的实体类中
         BeanUtils.copyProperties(taskReqVO, projectTask);
+        // 设置创建人，创建时间，更改人，更改时间
         projectTask.setCreatedBy(SecurityUtils.getUsername());
         projectTask.setCreatedTime(new Date());
         projectTask.setUpdatedBy(SecurityUtils.getUsername());
         projectTask.setUpdatedTime(new Date());
+        // 将我们的任务插入到数据库中
         projectTaskMapper.insert(projectTask);
 
         // 2、添加任务成员
@@ -381,15 +392,19 @@ public class ProjectTaskServiceImpl extends ServiceImpl<ProjectTaskMapper, Proje
         extracted(taskReqVO.getTaskName(), taskReqVO.getUserId(), SecurityUtils.getUsername(), projectTask.getId());
 
         // 5、添加或更新审批设置（远程调用 pmhub-workflow 微服务）
+        // ApprovalSetDTO构造审批设置数据传输对象，包含任务 ID、状态、审批人、流程定义 ID 等。
         ApprovalSetDTO approvalSetDTO = new ApprovalSetDTO(projectTask.getId(), ProjectStatusEnum.TASK.getStatusName(),
                 taskReqVO.getApproved(), taskReqVO.getDefinitionId(), taskReqVO.getDeploymentId());
+        // 远程调用微服务pmhub-workflow，将审批设置数据传输对象传递给insertOrUpdateApprovalSet方法，并返回结果。
         R<Boolean> result = wfDeployService.insertOrUpdateApprovalSet(approvalSetDTO, SecurityConstants.INNER);
 
+        // 如果远程调用失败（返回 null 或失败状态），抛出 ServiceException，触发事务回滚。
         if (Objects.isNull(result) || Objects.isNull(result.getData())
                 || R.fail().equals(result.getData())) {
             throw  new ServiceException("远程调用审批服务失败");
         }
         log.info("---------------结束新建任务: "+"\t"+"xid: "+xid);
+        // 返回新创建任务的 ID
         return projectTask.getId();
     }
 

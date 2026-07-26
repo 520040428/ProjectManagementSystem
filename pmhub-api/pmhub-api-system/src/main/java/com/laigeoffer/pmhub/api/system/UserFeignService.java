@@ -14,9 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * @author canghe
+ * @author JingYi
  * @description 用户服务Feign接口
- * @create 2024-04-24-22:38
  */
 @FeignClient(contextId = "userFeignService", value = ServiceNameConstants.SYSTEM_SERVICE, fallbackFactory = UserFeginFallbackFactory.class)
 public interface UserFeignService {
