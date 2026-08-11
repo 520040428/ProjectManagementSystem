@@ -4,9 +4,8 @@ import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author canghe
+ * @author JingYi
  * @description DistributedLock 分布式锁注解
- * @create 2024-06-17-10:16
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

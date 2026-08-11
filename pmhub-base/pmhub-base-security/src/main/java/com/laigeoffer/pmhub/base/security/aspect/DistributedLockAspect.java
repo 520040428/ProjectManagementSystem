@@ -25,9 +25,8 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * @author canghe
+ * @author JingYi
  * @description DistributedLockAspect
- * @create 2024-06-17-10:20
  */
 @Aspect
 @Slf4j
@@ -53,7 +52,7 @@ public class DistributedLockAspect {
 
     @Around("distributorLock()")
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
-        // 获取DistributedLock
+        // 获取DistributedLock注解
         DistributedLock distributedLock = this.getDistributedLock(pjp);
         // 获取 lockKey
         String lockKey = this.getLockKey(pjp, distributedLock);
@@ -73,6 +72,7 @@ public class DistributedLockAspect {
                 throw new UtilException("Duplicate request for method still in process");
             }
 
+            // 执行业务方法
             return pjp.proceed();
         } catch (Exception e) {
             throw e;
@@ -88,10 +88,15 @@ public class DistributedLockAspect {
      * @throws NoSuchMethodException
      */
     private DistributedLock getDistributedLock(ProceedingJoinPoint pjp) throws NoSuchMethodException {
+        // 获取调用方法的名称
         String methodName = pjp.getSignature().getName();
+        // 获取目标对象的Class对象
         Class clazz = pjp.getTarget().getClass();
+        // 获取方法参数的类型数组
         Class<?>[] par = ((MethodSignature) pjp.getSignature()).getParameterTypes();
+        // 根据方法名和参数类型获取对应的Method对象
         Method lockMethod = clazz.getMethod(methodName, par);
+        // 从Method对象上获取DistributedLock注解
         DistributedLock distributedLock = lockMethod.getAnnotation(DistributedLock.class);
         return distributedLock;
     }

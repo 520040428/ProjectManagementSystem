@@ -85,6 +85,7 @@ public class OAuth2ServiceImpl implements IOAuth2Service {
 
     /**
      * 创建用于授权的用户code
+     * @description 对于有时效性的数据（授权码、Token），设置 TTL 作为兜底策略，防止脏数据永不过期。这体现了 "主动删除 + TTL 兜底" 的双重保障
      *
      * @param userId 用户id
      * @return {@link String}

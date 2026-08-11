@@ -14,10 +14,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
+
 
 
 /**
@@ -52,7 +55,7 @@ public class TaskOverdueNotifyJob {
                         ProjectTaskNotify projectTaskNotify = projectTaskNotifyMapper.selectOne(qw);
                         // 如果数据库不存在记录则就进行消息通知及插入数据库
                         if (projectTaskNotify == null) {
-                            // 进行逾期任务消息提醒（需要使用MQ请开启这段注释）
+//                            // 进行逾期任务消息提醒（需要使用MQ请开启这段注释）
 //                            TaskOvertimeRemindDTO taskOvertimeRemindDTO = new TaskOvertimeRemindDTO();
 //                            // 设置发送用户
 //                            taskOvertimeRemindDTO.setUserIds(Collections.singletonList(taskNotifyDTO.getUserWxName()));

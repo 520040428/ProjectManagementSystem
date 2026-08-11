@@ -72,6 +72,7 @@ public class RateLimiterAspect {
             Long number = redisTemplate.execute(limitScript, keys, count, time);
             // isNull(number)防御性变成，如果Redis挂了或者网络尝试，excute可能返回null
             if (StringUtils.isNull(number) || number.intValue() > count) {
+                // 如果限流，就会在控制台打印“访问过于频繁，请稍后再试”
                 throw new ServiceException("访问过于频繁，请稍候再试");
             }
             log.info("限制请求'{}',当前请求'{}',缓存key'{}'", count, number.intValue(), combineKey);

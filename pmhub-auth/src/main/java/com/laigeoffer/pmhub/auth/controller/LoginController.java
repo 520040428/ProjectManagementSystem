@@ -46,6 +46,7 @@ public class LoginController {
      * @param form
      * @return
      */
+    // 因为登录接口在我们的网关的白名单中，为了方式登录接口被刷，我们使用了这个Redis+Lua限流
     @RateLimiter(key = "rate_limit:login", time = 30, count = 10)
     @PostMapping("login")
     public AjaxResult login(@RequestBody LoginBody form) {
@@ -100,6 +101,10 @@ public class LoginController {
         return R.ok();
     }
 
+    /**
+     * 测试JMeter压测流程
+     * @return
+     */
     @RateLimiter(key = "limitTest", time = 10, count = 2)
     @PostMapping(value = "/limitTest")
     public Long limitTest() {

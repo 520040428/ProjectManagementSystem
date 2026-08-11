@@ -33,10 +33,12 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
     /**
      * 项目启动时，初始化参数到缓存
+     * @funciton 避免大量用户请求进来时，缓存中没有数据，大量请求打到DB上
      */
+    // 在依赖注入完成之后，且在对象被外部使用之前，自动执行被注解的方法
     @PostConstruct
     public void init() {
-        loadingConfigCache();
+        loadingConfigCache();   // 从MySQL中全量加载 sys_config 表数据到 Redis
     }
 
     /**
@@ -55,20 +57,24 @@ public class SysConfigServiceImpl implements ISysConfigService {
 
     /**
      * 根据键名查询参数配置信息
+     * @description 经典的“先查缓存，缓存miss后再查DB,并回写缓存”流程
      *
      * @param configKey 参数key
      * @return 参数键值
      */
     @Override
     public String selectConfigByKey(String configKey) {
+        // 1.先查Redis缓存
         String configValue = Convert.toStr(redisService.getCacheObject(getCacheKey(configKey)));
         if (StringUtils.isNotEmpty(configValue)) {
             return configValue;
         }
+        // 2.缓存未命中，查MySQL
         SysConfig config = new SysConfig();
         config.setConfigKey(configKey);
         SysConfig retConfig = configMapper.selectConfig(config);
         if (StringUtils.isNotNull(retConfig)) {
+            // 3.将DB结果写入缓存(此处没有设TTL，靠主动更新维护一致性)
             redisService.setCacheObject(getCacheKey(configKey), retConfig.getConfigValue());
             return retConfig.getConfigValue();
         }
@@ -108,7 +114,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
      */
     @Override
     public int insertConfig(SysConfig config) {
+        // 1.先写MySQL
         int row = configMapper.insertConfig(config);
+        // 2.DB成功后更新Redis
         if (row > 0) {
             redisService.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
         }
@@ -123,8 +131,10 @@ public class SysConfigServiceImpl implements ISysConfigService {
      */
     @Override
     public int updateConfig(SysConfig config) {
+        // 1.先写MySQL
         int row = configMapper.updateConfig(config);
         if (row > 0) {
+            // 2.DB成功后刷新Redis
             redisService.setCacheObject(getCacheKey(config.getConfigKey()), config.getConfigValue());
         }
         return row;
@@ -142,7 +152,9 @@ public class SysConfigServiceImpl implements ISysConfigService {
             if (StringUtils.equals(UserConstants.YES, config.getConfigType())) {
                 throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
             }
+            // 1.先删MySQL
             configMapper.deleteConfigById(configId);
+            // 2.再删Redis缓存
             redisService.deleteObject(getCacheKey(config.getConfigKey()));
         }
     }

@@ -21,6 +21,7 @@ public class RedissonDistributedLock implements IDistributedLock {
 
     @Resource
     private RedissonClient redissonClient;
+
     /**
      * 统一前缀
      */
@@ -39,7 +40,8 @@ public class RedissonDistributedLock implements IDistributedLock {
         if (lockTime > 0L) {
             lock.lock(lockTime, unit);
         } else {
-            // 具有Watch Dog 自动延期机制 默认续30s 每隔30/3=10 秒续到30s
+            // Redisson具有Watch Dog，每隔10s检查持有锁的线程是否还在运行
+            // 在运行则自动延期机制 默认续30s 每隔30/3=10 秒续到30s
             lock.lock();
         }
         return new ILock(lock, this);
