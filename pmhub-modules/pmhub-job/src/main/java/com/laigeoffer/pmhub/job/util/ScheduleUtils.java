@@ -11,7 +11,7 @@ import org.quartz.*;
 /**
  * 定时任务工具类
  *
- * @author canghe
+ * @author JingYi
  */
 public class ScheduleUtils {
     /**
@@ -47,13 +47,14 @@ public class ScheduleUtils {
         // 构建job信息
         Long jobId = job.getJobId();
         String jobGroup = job.getJobGroup();
+        // Quartz任务实例载体，绑定JobKey
         JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(getJobKey(jobId, jobGroup)).build();
 
-        // 表达式调度构建器
+        // 表达式调度构建器,构建Cron调度器，设置misfire错过执行策略
         CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(job.getCronExpression());
         cronScheduleBuilder = handleCronScheduleMisfirePolicy(job, cronScheduleBuilder);
 
-        // 按新的cronExpression表达式构建一个新的trigger
+        // 按新的cronExpression表达式构建一个新的trigger,绑定cron表达式，TriggerKey
         CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(getTriggerKey(jobId, jobGroup))
                 .withSchedule(cronScheduleBuilder).build();
 

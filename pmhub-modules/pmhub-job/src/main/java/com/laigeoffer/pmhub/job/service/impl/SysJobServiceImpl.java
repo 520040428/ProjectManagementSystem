@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 定时任务调度信息 服务层
  *
- * @author canghe
+ * @author JingYi
  */
 @Service
 public class SysJobServiceImpl implements ISysJobService {
